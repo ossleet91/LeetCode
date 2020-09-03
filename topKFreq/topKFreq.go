@@ -23,6 +23,10 @@ package main
 //
 // https://leetcode.com/problems/top-k-frequent-elements
 
+import (
+	"container/heap"
+)
+
 func topKFreq(nums []int, k int) []int {
 	// Creata a map of each number and its frequency.
 	freq := make(map[int]int)
@@ -58,6 +62,73 @@ func topKFreq(nums []int, k int) []int {
 		}
 	}
 
+	return res
+}
+
+type Item struct {
+	n     int // value to track in heap
+	count int // n's frequency or count
+	index int // required by container/heap
+}
+
+type PriorityQueue []*Item
+
+func (pq *PriorityQueue) Len() int {
+	return len(*pq)
+}
+
+func (pq *PriorityQueue) Push(x interface{}) {
+	item := x.(*Item)
+	item.index = pq.Len()
+	*pq = append(*pq, item)
+}
+
+func (pq *PriorityQueue) Pop() interface{} {
+	old := *pq
+	n := pq.Len()
+	item := old[n-1]
+	old[n-1] = nil
+	item.index = -1
+	*pq = old[:n-1]
+	return item
+}
+
+func (pq PriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+	pq[i].index = i
+	pq[j].index = j
+}
+
+func (pq PriorityQueue) Less(i, j int) bool {
+	return pq[i].count > pq[j].count
+}
+
+func topKFreqPQ(nums []int, k int) []int {
+	// Creata a map of each number and its frequency.
+	freq := make(map[int]int)
+	for _, n := range nums {
+		freq[n]++
+	}
+
+	pq := make(PriorityQueue, 0)
+	heap.Init(&pq)
+
+	i := 0
+	for n, count := range freq {
+		item := Item{
+			n:     n,
+			count: count,
+			index: i,
+		}
+		heap.Push(&pq, &item)
+		i++
+	}
+
+	var res []int
+	for i := 0; i < k && pq.Len() > 0; i++ {
+		item := heap.Pop(&pq).(*Item)
+		res = append(res, item.n)
+	}
 	return res
 }
 
