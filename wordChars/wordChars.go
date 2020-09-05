@@ -124,6 +124,42 @@ func countCharacters(words []string, chars string) int {
 	return count
 }
 
+// Returns the length of word if word can be formed using letters in
+// chars. Returns 0 otherwise. All returns are via channels.
+func countIfWordFromChars(words []string, charCounts []int, c chan int) {
+	for _, word := range words {
+		wordCounts := getCounts(word)
+		count := len(word)
+
+		// 'word' can be made out of 'chars' if every letter in
+		// word has same or lesser count of chars.
+		for i := 0; i < maxAlphabets; i++ {
+			if charCounts[i] < wordCounts[i] {
+				count = 0
+				break
+			}
+		}
+
+		c <- count
+	}
+
+	close(c)
+}
+
+// Using simple array counter method and goroutines.
+func countCharactersGoRoutine(words []string, chars string) int {
+	charCounts := getCounts(chars)
+	c := make(chan int, len(words))
+	count := 0
+
+	go countIfWordFromChars(words, charCounts, c)
+	for i := range c {
+		count += i
+	}
+
+	return count
+}
+
 // Using CountMap.
 func countCharactersCM(words []string, chars string) int {
 	count := 0
