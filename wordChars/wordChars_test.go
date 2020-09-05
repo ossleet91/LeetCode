@@ -71,6 +71,20 @@ func TestCountCharacters(t *testing.T) {
 	}
 }
 
+func TestCountCharactersGoRoutine(t *testing.T) {
+	tests := []TestCase{
+		{[]string{"cat", "bt", "hat", "tree"}, "atach", 6},
+		{[]string{"hello", "world", "leetcode"}, "welldonehoneyr", 10},
+	}
+
+	for _, tt := range tests {
+		got := countCharactersGoRoutine(tt.words, tt.chars)
+		if got != tt.want {
+			t.Errorf("failed for %#v: got=%d\n", tt, got)
+		}
+	}
+}
+
 func TestCountCharactersCM(t *testing.T) {
 	tests := []TestCase{
 		{[]string{"cat", "bt", "hat", "tree"}, "atach", 6},
