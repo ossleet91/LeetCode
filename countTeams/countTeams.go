@@ -81,5 +81,68 @@ func numTeamsNaive(ratings []int) int {
 	return res
 }
 
+// Mid-rating approach.
+//
+// Consider each rating as middle-rating in the triplet. Then, based on
+// the problem's constraint, we can consider the triplet as valid only
+// if the left and right ratings of mid are smaller and bigger than mid
+// (or vice-versa).
+//
+// For each rating, mid, accumulate the count of smaller/bigger ratings
+// to mid's left and right as leftSmall, leftBig, rightSmall, rightBig.
+//
+// Then, no. of valid triplets that can be formed with 'mid' in the
+// middle is:
+//	leftSmall*rightBig (ri < rj < rk) +
+//	rightSmall*leftBig (ri > rj > rk)
+//
+// Compute this for every rating and accumulate the valid triplets as
+// result.
+//
+// Time: O(N^2). Outer-loop with each element as mid and inner-loop to
+//	 find smaller/bigger ratings.
+// Space: O(1). Just five counters (one each for left/right small/big
+//        and result).
+func numTeams(ratings []int) int {
+	res := 0
+
+	if len(ratings) < 3 {
+		return res
+	}
+
+	// We can just consider ratings[1..n-1] as first/last elements,
+	// by definition, cannot be in the middle of a triplet.
+	for i := 1; i < len(ratings)-1; i++ {
+		mid := ratings[i]
+		smallerLeft, biggerLeft := 0, 0
+		smallerRight, biggerRight := 0, 0
+
+		// Scan left-side for smaller/bigger ratings than mid.
+		for j := i - 1; j >= 0; j-- {
+			if ratings[j] < mid {
+				smallerLeft++
+			}
+			if ratings[j] > mid {
+				biggerLeft++
+			}
+		}
+
+		// Scan right-side for smaller/bigger ratings than mid.
+		for j := i + 1; j < len(ratings); j++ {
+			right := ratings[j]
+			if right < mid {
+				smallerRight++
+			}
+			if right > mid {
+				biggerRight++
+			}
+		}
+
+		res += smallerLeft*biggerRight + smallerRight*biggerLeft
+	}
+
+	return res
+}
+
 func main() {
 }
