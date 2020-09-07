@@ -62,5 +62,23 @@ func paritySortTwoPtrs(arr []int) []int {
 	return arr
 }
 
+// Sort given array by only parity (even/odd); even elements followed by
+// odd.
+//
+// Uses Lomuto partition scheme algorithm.
+// https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
+//
+// Time: O(N). Every element is looked almost once.
+// Space: O(1). Swaps are done in place. Just two pointers are used.
+func paritySortLomuto(arr []int) []int {
+	for fast, slow := 0, 0; fast < len(arr); fast++ {
+		if arr[fast]%2 == 0 {
+			arr[fast], arr[slow] = arr[slow], arr[fast]
+			slow++
+		}
+	}
+	return arr
+}
+
 func main() {
 }
