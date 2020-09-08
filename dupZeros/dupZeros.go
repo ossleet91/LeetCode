@@ -72,5 +72,70 @@ func duplicateZerosNaive(arr []int) {
 	}
 }
 
+// Duplicate zeros in an array in-place.
+//
+// Use two pointers: origIndex, to keep track of element in the given
+// array, and updatedIndex, to track where the element should actually
+// go (this accounts for zero duplications).
+//
+// Based on:
+// https://leetcode.com/problems/duplicate-zeros/discuss/315395/Java-O(n)-Time-O(1)-space-Two-passes-for-loop-and-while-loop
+//
+// Time: O(N). Array is looped linearly once.
+//
+// Space: O(1). Only couple of pointers and a counter.
+func duplicateZerosTwoPtrs(arr []int) {
+	// Count all zeros. Used to compute the final position of each
+	// element once we start duplicating the elements.
+	zeroCount := 0
+	for _, n := range arr {
+		if n == 0 {
+			zeroCount++
+		}
+	}
+
+	// origIndex is the original index of every element in the
+	// array; for 0..len(arr)-1.
+	origIndex := len(arr) - 1
+
+	// updatedIndex tracks the index at which a given number is
+	// supposed to go at.
+	//
+	// Since it accounts for the additional zeros that we have to
+	// duplicate, the value might be outside the array bounds. So,
+	// check for bounds every time when this index is used to set an
+	// element.
+	updatedIndex := len(arr) + zeroCount - 1
+
+	for origIndex >= 0 && updatedIndex >= 0 {
+		n := arr[origIndex]
+
+		// Insert the current element at the appropriate index.
+		if updatedIndex < len(arr) {
+			arr[updatedIndex] = n
+		}
+
+		if n == 0 {
+			// Current element is a zero and we have to
+			// duplicate if index is within array-bound.
+			//
+			// So, update current position and duplicate the
+			// zero. Again, check position is within array
+			// bounds.
+			updatedIndex--
+			if updatedIndex < len(arr) {
+				arr[updatedIndex] = n
+			}
+		}
+
+		// Go to next element. This could have been done in the
+		// 'for', but since init was moved out (due to verbose
+		// comments), moved post section out of the 'for' as
+		// well.
+		origIndex--
+		updatedIndex--
+	}
+}
+
 func main() {
 }
