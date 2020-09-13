@@ -41,6 +41,7 @@ package main
 // https://leetcode.com/problems/height-checker
 
 import (
+	"math"
 	"sort"
 )
 
@@ -55,6 +56,87 @@ func heightCheckerSort(heights []int) int {
 	sorted := make([]int, len(heights))
 	copy(sorted, heights)
 	sort.Ints(sorted)
+
+	res := 0
+	for i := 0; i < len(heights); i++ {
+		if heights[i] != sorted[i] {
+			res++
+		}
+	}
+
+	return res
+}
+
+func minMax(nums []int) (int, int) {
+	switch len(nums) {
+	case 0:
+		return 0, 0
+	case 1:
+		return nums[0], nums[0]
+	default:
+		min, max := math.MaxInt32, math.MinInt32
+
+		for _, n := range nums {
+			if n < min {
+				min = n
+			}
+
+			if n > max {
+				max = n
+			}
+		}
+
+		return min, max
+	}
+}
+
+func doCountSort(nums []int, max int) []int {
+	if len(nums) < 2 {
+		return nums
+	}
+
+	// Compute frequency of each element and its prefix sum.
+	prefixSum := make([]int, max+1)
+	for _, n := range nums {
+		prefixSum[n]++
+	}
+
+	for i := 1; i < len(prefixSum); i++ {
+		prefixSum[i] += prefixSum[i-1]
+	}
+
+	// Do counting sort.
+	//
+	// For each element in given array, n, find it's prefix sum. The
+	// index in sorted array for 'n' is its prefixSum-1; i.e., if
+	// prefixSum is 5, then 'n' should be placed at index 4.
+	//
+	// Decrement the prefixSum so that we can handle duplicates.
+	sorted := make([]int, len(nums))
+	for _, n := range nums {
+		index := prefixSum[n] - 1
+		sorted[index] = n
+		prefixSum[n]--
+	}
+
+	return sorted
+}
+
+func countSort(nums []int) []int {
+	_, max := minMax(nums)
+	return doCountSort(nums, max)
+}
+
+// Sort the given array and count no. of positions that differ between
+// sorted and unsorted array. The count is the total no. of moves
+// required to arrange students by height.
+//
+// Time: O(N+k). Since counting sort is used for sorting.
+//
+// Space: O(N). Extra space for sorted array.
+func heightChecker(heights []int) int {
+	// 100 is the max. value in heights. See constraint #2.
+	sorted := doCountSort(heights, 100)
 
 	res := 0
 	for i := 0; i < len(heights); i++ {
